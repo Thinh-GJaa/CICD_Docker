@@ -1,0 +1,37 @@
+name: Deploy to Docker
+
+on:
+  push:
+    branches:
+      - main  # Triggers khi có push lên nhánh main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # Sử dụng action để checkout mã nguồn
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # Đăng nhập vào Docker Hub
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker-compose -f ./docker-compose.yml build
+          docker-compose -f ./docker-compose.yml push
+
+      - name: SSH into deployment server and pull updates
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.DEPLOY_SERVER }}  # Địa chỉ server triển khai
+          username: ${{ secrets.DEPLOY_USERNAME }}  # Tên người dùng để SSH vào server
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # Khóa SSH dùng để xác thực
+
+          # Thực hiện các lệnh sau trên server
+          script: |
+            cd path_to_your_docker_compose_files
+            docker-compose -f ./docker-compose.yml pull
+            docker-compose -f ./docker-compose.yml up -d
