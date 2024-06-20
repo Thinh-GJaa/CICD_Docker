@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    restart: always
+    ports:
+      - 8000:80  # Chuyển tiếp cổng 80 trong container sang cổng 8000 của máy host
+    environment:
+      WORDPRESS_DB_HOST: db
+      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: root
+      WORDPRESS_DB_PASSWORD: example
+    volumes:
+      - wordpress:/var/www/html  # Để lưu trữ dữ liệu WordPress
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_ROOT_PASSWORD: example
+    volumes:
+      - db_data:/var/lib/mysql  # Để lưu trữ dữ liệu MySQL
+
+volumes:
+  wordpress:
+  db_data:
