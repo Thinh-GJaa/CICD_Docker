@@ -1,24 +1,42 @@
-version: '3.8'
+version: '3'
 
 services:
-  wordpress:
-    image: wordpress:latest
-    ports:
-      - "8000:80"  # Cổng mà bạn muốn dùng để truy cập Wordpress, ở đây là cổng 8000
-    environment:
-      WORDPRESS_DB_HOST: db
-      WORDPRESS_DB_NAME: wordpress
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-    volumes:
-      - ./wordpress:/var/www/html  # Mount volume để lưu trữ dữ liệu Wordpress
-
   db:
-    image: mysql:5.7
+    image: mariadb
+    restart: always
     environment:
+      MYSQL_ROOT_PASSWORD: example
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
-      MYSQL_ROOT_PASSWORD: wordpress # Thay bằng mật khẩu root cho MySQL của bạn
     volumes:
-      - ./db:/var/lib/mysql  # Mount volume để lưu trữ dữ liệu MySQL
+      - db_data:/var/lib/mysql
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress
+    ports:
+      - "80:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - wordpress:/var/www/html
+
+  nginx:
+    image: nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - wordpress:/var/www/html
+    depends_on:
+      - wordpress
+
+volumes:
+  db_data:
+  wordpress:
