@@ -2,6 +2,7 @@
     "name": "thinh/cicd",
     "description": "cicd",
     "type": "project",
+    "license": "MIT",
     "minimum-stability": "stable",
     "require": {}
 }
