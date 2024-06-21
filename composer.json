@@ -1,0 +1,7 @@
+{
+    "name": "thinh/cicd",
+    "description": "cicd",
+    "type": "project",
+    "minimum-stability": "stable",
+    "require": {}
+}
